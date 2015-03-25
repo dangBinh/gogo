@@ -89,6 +89,43 @@ func main() {
 	
 	twoD2 := make([][]int, 3)
 	fmt.Println(twoD2)
+
+	// Map 
+	// associative data type 
+	sMap := make(map([string]int))
+	sMap["k1"] = 7
+	sMap["k2"] = 6
+	fmt.Println(sMap)
+
+	delete(sMap, "k2")
+	_, prs := sMap["k2"]; // loai bo truong hop thieu key
+	fmt.Println(sMap);
+
+	// Range
+	// Lap qua cac phan tu
+	myNums := []int{2, 3, 4}
+	sum := 0
+	for _, num := range nums {
+		sum += sum
+	}
+	fmt.Println(sum)
+
+	//Closure giong js
+}
+func plus(a, b, c int){
+	return a + b + c
+} 
+
+func vals(int, int) {
+	return a, b // a, b := vals(1, 2)
 }
 
-	
+// goi voi nhieu doi so 
+func sum(nums ...int) { // su dung slice func(slice ...)
+    fmt.Print(nums, " ")
+    total := 0
+    for _, num := range nums {
+        total += num
+    }
+    fmt.Println(total)
+}	

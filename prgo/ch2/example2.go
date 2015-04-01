@@ -7,12 +7,16 @@ import (
 	"log"
 	"strings"
 	"strconv"
+	"math"
 )
 
 type statistics struct {
 	numbers []float64
 	mean float64
 	median float64
+	mode []float64
+	stdDev float64
+	// stdDev float64
 }
 
 const form = `<form action="/" method="POST">
@@ -28,6 +32,8 @@ func getStats(numbers []float64) (stats statistics) {
 	sort.Float64s(stats.numbers)
 	stats.mean = sum(numbers) / float64(len(numbers))
 	stats.median = median(numbers)
+	stats.mode = mode(numbers)
+	stats.stdDev = stdDev(numbers)
 	return stats
 }
 
@@ -44,6 +50,72 @@ func median(numbers []float64) float64{
 	if(len(numbers) % 2 == 0) {
 		result = (result + numbers[middle - 1]) / 2
 	}
+	return result
+}
+
+func mode(numbers []float64) []float64{
+	var result []float64
+	var final []float64
+	var (
+		i int
+		j int
+		temp float64
+		bound int
+	)
+	// sap xep lai mang theo thu tu tang dan 
+	// tinh mode theo buoc nhay neu buoc nhay la 1 thi khong luu vao mang
+	// neu buoc nhay > 1 thi luu vao mang 
+	// lay gia tri lon nhat trong mang -> mode
+	if len(numbers) > 0 {
+		for i = 0; i < len(numbers) - 1; i++ {
+			for j = 1; j < len(numbers); j++ {
+				if numbers[i] > numbers [j] {
+					temp = numbers[i]
+					numbers[i] = numbers[j]
+					numbers[j] = temp
+				}
+			}
+		}
+		i = 0
+		for i < len(numbers) {
+			bound = 0
+			for j = i; j < len(numbers); j++ {
+				if numbers[i] == numbers[j] {
+					bound++
+				}
+			}
+			if bound >= 2 {
+				result = append(result, numbers[i], float64(bound))
+				i = i + bound
+			} else {
+				i ++
+			}
+		}
+		if len(result) > 0 {
+			i = 0
+			max := result[i+1]
+			for i = 0; i < len(result); i += 2 {
+				if max < result[i+1] {
+					max = result[i+1]
+				}
+			}
+			for i = 0; i < len(result); i+= 2 {
+				if max == result[i+1] {
+					final = append(final, result[i])
+				}
+			}
+		}
+	}
+	return final
+}
+
+func stdDev(numbers []float64) (result float64) {
+	result = 0.0
+	median := median(numbers)
+	for _, x := range numbers {
+		result = result + math.Pow(x - median, 2)
+	}
+	result = math.Sqrt(result / float64(len(numbers)) )
 	return result
 }
 
@@ -97,5 +169,7 @@ func formatStats(stats statistics) string {
 	<tr><td>Count</td><td>%d</td></tr>
 	<tr><td>Mean</td><td>%f</td></tr>
 	<tr><td>Median</td><td>%f</td></tr>
-	</table>`, stats.numbers, len(stats.numbers), stats.mean, stats.median)
+	<tr><td>Mode</td><td>%f</td></tr>
+	<tr><td>Std. Dev</td><td>%f</td></tr>
+	</table>`, stats.numbers, len(stats.numbers), stats.mean, stats.median, stats.mode, stats.stdDev)
 }

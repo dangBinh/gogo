@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"log"
 	// "strings"
-	// "strconv"
+	"strconv"
 	"math"
 	"math/cmplx"
 )
@@ -37,10 +37,9 @@ func homePage(writer http.ResponseWriter, request *http.Request) { //ResponseWri
 		fmt.Fprintf(writer, anError, err)
 	} else {
 		if arg, message, ok := processRequest(request); ok{
+			formatQuestion(arg)
 			x1, x2 := solve(arg)
-			fmt.Println(x1, x2)
-			// fmt.Fprint(writer, formatQuestion(question))
-			// fmt.Fprint(writer, formatSolution(result))
+			formatSolution(x1, x2)
 		} else {
 			// fmt.Fprintf(writer, anError, message)
 		}
@@ -52,33 +51,36 @@ func processRequest(request *http.Request) ([]float64, string, bool) {
 	var x []float64
 	req := request.Form["arg[]"]
 	for _, x := range req {
-		if x, err := strconv.ParseFloat(x); if err != nil {
+		if x, err := strconv.ParseFloat(x, 64); err != nil {
 			return x, x + "Not invalid", false
 		}
 	}	
-	fmt.Println(req)
 	x = append(x, req)
 	return x, "", true
 }
 
-func formatQuestion() {
-
+func formatQuestion(arg []float64) string {
+	return fmt.Sprintf("%s<i>x</i>² + %s<i>x</i> + %s", arg[0],
+    arg[1], arg[2]) 
 }
 
-func solve(question []float64) (complex128, complex128){
+func solve(question []float64) (complex128, complex128) {
 	if len(question) > 0 {
 		a := complex(question[1], 0)
 		b := complex(question[2], 0)
 		c := complex(question[3], 0)
 		delta := cmplx.Sqrt(cmplx.Pow(b, 2) - 4 * a * c)
-			x1 := ( -b + cmplx.Sqrt(delta) ) / (2 * a)
-			x2 := ( -b - cmplx.Sqrt(delta) ) / (2 * a)
-			return x1 ,x2 
+		x1 := ( -b + cmplx.Sqrt(delta) ) / (2 * a)
+		x2 := ( -b - cmplx.Sqrt(delta) ) / (2 * a)
+		return x1 ,x2 
 	}
 }
 
-func formatSolution() {
-	
+func formatSolution(x1, x2 complex128) string {
+	if EqualComplex(x1, x2) {
+        return fmt.Sprintf("<i>x</i>=%f", x1)
+    }
+    return fmt.Sprintf("<i>x</i>=%f or <i>x</i>=%f", x1, x2)
 }
 
 // EqualFloat() tra ve gia tri dung x xap xi gan bang y voi limit cho truoc 
@@ -88,7 +90,7 @@ func EqualFloat(x, y, limit float64) bool {
 	}
 	return math.Abs(x - y) <= (limit * math.Min(math.Abs(x), math.Abs(y)))
 }
-
-func EqualComplex(x, y) {
-
+// -1 will return greater accurarry limit 
+func EqualComplex(x, y complex128) bool{
+	return EqualFloat(real(x), real(y), -1) && EqualFloat(imag(x), imag(y), -1)
 }

@@ -16,18 +16,23 @@ type Song struct {
 }
 
 func main() {
-	// check xem co dieu kien dau vao o console hay khong 
-	// check xem xau co ket thuc boi suffix la .m3u hay khong
-	if len(os.Args) == 1 || !strings.HasSuffix(os.Args[1], ".m3u") {
-		fmt.Printf("usage %s <file.m3u>\n", filepath.Base(os.Args[0])) // tra ve ten cua file
+	// check xem co duoi la .m3u hay .pls khong neu khong thi phai dien ten duoi cho dung
+	m3uExt := strings.HasSuffix(os.Args[1], ".m3u")
+	plsExt := strings.HasSuffix(os.Args[1], ".pls")
+	if len(os.Args) == 1 || (!m3uExt && !plsExt) {
+		fmt.Printf("usage %s <file.m3u> or <file.pls>\n", filepath.Base(os.Args[0])) // tra ve ten cua file
 		os.Exit(1);
 	}
+	// doc va phan loai file .m3u va .pls 
 	// ioutil.Readfile doc file va tra ve toan bo gia byte cua file 
 	if rawBytes, err := ioutil.ReadFile(os.Args[1]); err != nil {
 		log.Fatal(err)
-	} else {
+	} else if m3uExt {
 		songs := readM3uPlayList(string(rawBytes));
 		writePlsPlayList(songs);
+	} else if plsExt {
+		songs := readPlsPlayList(string(rawBytes));
+		writeM3uPlayList(songs)
 	}
 
 }
@@ -83,4 +88,37 @@ func writePlsPlayList(songs []Song) {
 		fmt.Printf("Length%d=%d\n", i, song.Seconds)
 	}
 	fmt.Printf("NumberOfEntries=%d\nVersion=2\n", len(songs))
+}
+func readPlsPlayList(data string) (songs []Song) {
+	var song Song 
+	for _, line := range strings.Split(data, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "[playlist]") {
+			continue
+		}
+		if j := strings.Index(line, "="); j != -1 {
+			if strings.HasPrefix(line[:j], "File") {
+				song.Filename = line[j+1:]
+			} else if strings.HasPrefix(line[:j], "Title") {
+				song.Title = line[j+1:]
+			} else if strings.HasPrefix(line[:j], "Length") {
+				if seconds, err := strconv.Atoi(line[j+1:]); err == nil {
+					song.Seconds = seconds;
+				}
+			}
+		}
+		if song.Filename != "" && song.Title != "" && song.Seconds != 0 {
+			songs = append(songs, song)
+			song = Song{}
+		}
+	}
+	return songs
+}
+func writeM3uPlayList(songs []Song) {
+	fmt.Println("#EXTM3U")
+	for _, song := range songs {
+		fmt.Printf("#EXTINF:%d,%s\n", song.Seconds, song.Title)
+		fmt.Println(song.Filename);
+		// fmt.Printf("%s\n", song.Filename)
+	} 
 }

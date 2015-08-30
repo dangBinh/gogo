@@ -17,24 +17,24 @@ func main() {
 	fmt.Println(!true);
 
 	// Variable
-	var f string = "string" 
+	var f string = "string"
 	var a1,b1 int = 1, 2
 	d:= "string" // short hand d string = "string"
- 	var e int // mac dinh la 0 
+ 	var e int // mac dinh la 0
  	fmt.Println(e);
 	fmt.Println(f, a1, b1, d)
 
-	// Constant 
+	// Constant
 	const n = 5000000
 	fmt.Println(s);
 	fmt.Println(math.Sin(n));
 
-	// For 
+	// For
 	i := 1
 	for i <= 3 {
 		fmt.Println(i)
 		i = i + 1
-	} 
+	}
 	for j := 7; j <= 9; j++ {
 		fmt.Println(j)
 	}
@@ -52,27 +52,27 @@ func main() {
 		fmt.Println("yeah")
 	}
 
-	// Switch 
+	// Switch
 	t := time.Now()
 	switch {
 		case t.Hour() < 12:
 			fmt.Println("Before noon")
-		default: 
+		default:
 			fmt.Println("After noon")
 	}
 
-	// Array 
-	var a [5]int 
+	// Array
+	var a [5]int
 	a[4] = 100
 	b := [5]int{1 ,2 , 3, 4, 5}
 	fmt.Println(b);
 	var twoD [4][5]int
 	fmt.Println(twoD);
 
-	// Slices 
+	// Slices
 	// Slice giong voi array nhung them nhieu chuc nang hon
-	// Slice duoc dinh kieu boi data type no chua 
-	// Tao slice voi make 
+	// Slice duoc dinh kieu boi data type no chua
+	// Tao slice voi make
 	s := make([]string, 3)
 	fmt.Println(s)
 
@@ -86,12 +86,12 @@ func main() {
 	fmt.Println(sliceUpTo)
 	var sliceUpFrom = s[2:]
 	fmt.Println(sliceUpFrom)
-	
+
 	twoD2 := make([][]int, 3)
 	fmt.Println(twoD2)
 
-	// Map 
-	// associative data type 
+	// Map
+	// associative data type
 	sMap := make(map([string]int))
 	sMap["k1"] = 7
 	sMap["k2"] = 6
@@ -114,13 +114,13 @@ func main() {
 }
 func plus(a, b, c int){
 	return a + b + c
-} 
+}
 
 func vals(int, int) {
 	return a, b // a, b := vals(1, 2)
 }
 
-// goi voi nhieu doi so 
+// goi voi nhieu doi so
 func sum(nums ...int) { // su dung slice func(slice ...)
     fmt.Print(nums, " ")
     total := 0
@@ -128,4 +128,4 @@ func sum(nums ...int) { // su dung slice func(slice ...)
         total += num
     }
     fmt.Println(total)
-}	
+}
